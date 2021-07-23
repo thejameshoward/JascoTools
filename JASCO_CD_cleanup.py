@@ -19,14 +19,14 @@ def PlotCD(JascoScanFile):
     f = JascoScanFile
     
     cd = f.get_CD()
-    x, y = cd.keys(), cd.values()
+    x, y = list(cd.keys()), list(cd.values())
     
     fig_CD, ax_CD = plt.subplots(1) #Create figure fig and add an axis, ax
-    plt.axhline(y=0, color = 'black')
+    plt.axhline(y=0, color = '#D1D1D1')
     ax_CD.plot(x,y)
     
     
-    plt.xlabel("CD (mDeg)")
+    plt.ylabel("CD (mDeg)")
     plt.xlabel("Wavelength (nm)")
     plt.title(f.name())
     plt.show()
@@ -35,7 +35,7 @@ def PlotAbsorbance(JascoScanFile):
     f = JascoScanFile
     
     absorbance = f.get_abs()
-    x, y = absorbance.keys(), absorbance.values()
+    x, y = list(absorbance.keys()), list(absorbance.values())
     
     fig_ABS, ax_ABS = plt.subplots(1) #Create figure fig and add an axis, ax
     ax_ABS.plot(x,y)
@@ -51,3 +51,4 @@ d = JascoScanFile("JRH_2074-2-S-PheNA.csv")
 content = d.get_content()
 PlotCD(d)
 PlotAbsorbance(d)
+print(d.get_max_CD())

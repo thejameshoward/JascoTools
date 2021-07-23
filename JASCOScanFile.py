@@ -31,10 +31,10 @@ class JascoScanFile():
     def name(self):
         return self.content[1][0]
     
-    def get_aquisition_date(self):
+    def aquisition_date(self):
         return self.content[1][4]
     
-    def get_aquisition_time(self):
+    def aquisition_time(self):
         return self.content[1][5]
     
     def get_wavelengths(self):
@@ -64,3 +64,12 @@ class JascoScanFile():
         else:
             print('There was a problem getting the CD data')
         return absorbance
+    
+    def get_max_CD(self):
+        cd = self.get_CD()
+        
+        if abs(min(cd.values())) > abs(max(cd.values())):
+            maxCD = min(cd.values())
+        else:
+            maxCD = max(cd.values())
+        return (list(cd.values()).index(maxCD), maxCD)
