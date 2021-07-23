@@ -72,4 +72,4 @@ class JascoScanFile():
             maxCD = min(cd.values())
         else:
             maxCD = max(cd.values())
-        return (list(cd.values()).index(maxCD), maxCD)
+        return (list(cd.keys())[list(cd.values()).index(maxCD)], maxCD)
