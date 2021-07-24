@@ -1,7 +1,7 @@
 import math
 import os
 import matplotlib.pyplot as plt
-from JASCOScanFile import JascoScanFile
+from JascoScanFile import JascoScanFile
 
 def FindCSVs():
     csvs = []
@@ -10,7 +10,7 @@ def FindCSVs():
             csvs.append(file)
     return csvs
 
-def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True):
+def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, plotwavelengths=None):
     #Define the scanfile we're working with, get the x and y lists for plotting
     f = JascoScanFile
     cd = f.get_CD()
@@ -40,7 +40,24 @@ def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True):
             str(maxcd[0]), #Wavelength
             str(math.ceil(maxcd[1]*100)/100)), #CD rounded up at the second decimal point
             horizontalalignment='left')
-
+    
+    #Plotwavelengths
+    if type(plotwavelengths) == tuple or type(plotwavelengths) == int or type(plotwavelengths) == float:
+        d = plotwavelengths
+        try:
+            for wl in d:
+                plt.plot(wl,cd[wl], marker='.', color='red')
+                plt.text(wl + (wl * 0.025), cd[wl] + (cd[wl] * 0.025), "{} nm, {} mDeg".format(
+                    str(wl), #Wavelength
+                    str(math.ceil(cd[wl]*100)/100)), #CD rounded up at the second decimal point
+                    horizontalalignment='left')
+        except(TypeError):
+                plt.plot(d, cd[d], marker='.', color='red')
+                plt.text(d + (d * 0.025), cd[d] + (cd[d] * 0.025), "{} nm, {} mDeg".format(
+                    str(d), #Wavelength
+                    str(math.ceil(cd[d]*100)/100)), #CD rounded up at the second decimal point
+                    horizontalalignment='left')
+    
     plt.ylabel("CD (mDeg)")
     plt.xlabel("Wavelength (nm)")
     
@@ -51,7 +68,7 @@ def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True):
         plt.title(title)
     plt.show()
     
-def PlotAbsorbance(JascoScanFile):
+def PlotAbsorbance(JascoScanFile, plotwavelengths=None):
     f = JascoScanFile
     absorbance = f.get_abs()
     x, y = list(absorbance.keys()), list(absorbance.values())
@@ -64,6 +81,23 @@ def PlotAbsorbance(JascoScanFile):
     ax_ABS.set_xlim(xlim, xlim2)
     ax_ABS.plot(x,y)
     
+    #Plotwavelengths
+    if type(plotwavelengths) == tuple or type(plotwavelengths) == int or type(plotwavelengths) == float:
+        d = plotwavelengths
+        try:
+            for wl in d:
+                plt.plot(wl,absorbance[wl], marker='.', color='red')
+                plt.text(wl + (wl * 0.025), absorbance[wl] + (absorbance[wl] * 0.025), "{} nm, {} au".format(
+                    str(wl), #Wavelength
+                    str(math.ceil(absorbance[wl]*100)/100)), #CD rounded up at the second decimal point
+                    horizontalalignment='left')
+        except(TypeError):
+                plt.plot(d, absorbance[d], marker='.', color='red')
+                plt.text(d + (d * 0.025), absorbance[d] + (absorbance[d] * 0.025), "{} nm, {} au".format(
+                    str(d), #Wavelength
+                    str(math.ceil(absorbance[d]*100)/100)), #CD rounded up at the second decimal point
+                    horizontalalignment='left')
+    
     plt.ylabel("Absorbance (au)")
     plt.xlabel("Wavelength (nm)")
     plt.title(f.name())
@@ -73,5 +107,5 @@ csvs = FindCSVs()
 
 for csv in csvs:
     f = JascoScanFile(csv)
-    PlotCD(f, plotmax=True, title=True, ylimits=(-50, 50))
-    PlotAbsorbance(f)
+    PlotCD(f, plotmax=False, title=True, ylimits=(-50, 50), plotwavelengths=(229, 210))
+    PlotAbsorbance(f, plotwavelengths=(229, 210))
