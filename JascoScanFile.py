@@ -21,21 +21,11 @@ class JascoScanFile():
                 raise ValueError("The file is not formatted like a JASCO .csv file")
         else:
             raise ValueError("The file is not a .csv file")
-  
-    def get_filepath(self):
-        return os.path.abspath(self.file)
-    
-    def get_content(self):
-        return self.content
-    
-    def name(self):
-        return self.content[1][0]
-    
-    def aquisition_date(self):
-        return self.content[1][4]
-    
-    def aquisition_time(self):
-        return self.content[1][5]
+            
+        self.path = os.path.abspath(self.file)
+        self.name = self.content[1][0]
+        self.aquisition_date = self.content[1][4]
+        self.aquisition_time = self.content[1][5]
     
     def get_wavelengths(self):
         FIRSTX = float(self.content[1][14]) #These array positions are hard coded, so they may have to be changed
@@ -62,7 +52,7 @@ class JascoScanFile():
             for point in range(int(self.content[1][16])):
                 absorbance[float(self.content[0][21 + point])] = float(self.content[3][21 + point])
         else:
-            print('There was a problem getting the CD data')
+            print('There was a problem getting the absorbance data')
         return absorbance
     
     def get_max_CD(self):
