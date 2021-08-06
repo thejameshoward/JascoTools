@@ -10,7 +10,7 @@ def FindCSVs():
             csvs.append(file)
     return csvs
 
-def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, plotwavelengths=None):
+def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, plotwavelengths=None, savefigure=False):
     #Define the scanfile we're working with, get the x and y lists for plotting
     f = JascoScanFile
     cd = f.get_CD()
@@ -63,9 +63,12 @@ def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, plotwavelengt
     
     #Title of the figure
     if title == True:               #By default the name of the scanfile
-        plt.title(f.name())
+        plt.title(f.name)
     elif isinstance(title, str):    #If it's a string, use that string as title
         plt.title(title)
+
+    if savefigure == True:
+        plt.savefig("./plots/{}_CD.svg ".format(f.name), dpi=300, format="svg")
     plt.show()
     
 def PlotAbsorbance(JascoScanFile, plotwavelengths=None):
@@ -100,12 +103,12 @@ def PlotAbsorbance(JascoScanFile, plotwavelengths=None):
     
     plt.ylabel("Absorbance (au)")
     plt.xlabel("Wavelength (nm)")
-    plt.title(f.name())
+    plt.title(f.name)
     plt.show()
 
 csvs = FindCSVs()
 
 for csv in csvs:
     f = JascoScanFile(csv)
-    PlotCD(f, plotwavelengths=(229), title=True, ylimits=(-50, 50))
+    PlotCD(f, plotwavelengths=(229), title=True, savefigure=True)
     PlotAbsorbance(f, plotwavelengths=(229))
