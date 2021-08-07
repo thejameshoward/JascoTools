@@ -13,7 +13,7 @@ def FindCSVs():
     return csvs
 
 
-def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, plotwavelengths=None, savefigure=False, returnfigure=False, color='purple'):
+def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, plotwavelengths=None, savefigure=False, returnfigure=False, color='purple', plotzeroline=False):
     # Define the scanfile we're working with, get the x and y lists for plotting
     f = JascoScanFile
     cd = f.get_CD()
@@ -31,7 +31,11 @@ def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, plotwavelengt
 
     # Create figure fig and add an axis, ax
     fig_CD, ax_CD = plt.subplots(1)
-    plt.axhline(y=0, color='#D1D1D1')   #Solid line at zero
+
+
+    if plotzeroline == True:
+        plt.axhline(y=0, color='#D1D1D1')   #Solid line at zero
+
     ax_CD.plot(x, y, color=color)    #Color
     ax_CD.set_ylim(ylim, ylim2)         #ylimits
     ax_CD.set_xlim(xlim, xlim2)         #xlimits
