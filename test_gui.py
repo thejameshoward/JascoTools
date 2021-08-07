@@ -15,18 +15,23 @@ from JascoScanFile import JascoScanFile
 class App():
     def __init__(self, root):
         self.root = root
+        self.file = None
 
     def _PlotCD(self):
         try:
             self.CDPlot.destroy()
         except:
             pass
+        if self.file == None:
+            print("File not selected")
+            return 0
         if self.color_entry.get() == '':
             self.CDPlot = PlotCD(JascoScanFile(
-                'S-TMA.csv'), returnfigure=True, plotzeroline=self.plot_zero_line.get())
+                self.file.name), returnfigure=True, plotzeroline=self.plot_zero_line.get())
         else:
-            self.CDPlot = PlotCD(JascoScanFile('S-TMA.csv'), returnfigure=True,
+            self.CDPlot = PlotCD(JascoScanFile(self.file.name), returnfigure=True,
                                  color=str(self.color_entry.get()), plotzeroline=self.plot_zero_line.get())
+
         self.CDPlot = self.CDPlot.get_tk_widget()
         self.CDPlot.grid(row=5, column=4)
 
@@ -35,14 +40,14 @@ class App():
         self.plot_button['command'] = self._PlotCD
         self.plot_button.grid(row=1, column=1)
 
-    def create_labels(self):
+    def create_left_side_labels(self):
         self.file_label = Label(text="File").grid(row=2, column=0)
         self.color_label = Label(text="Color").grid(row=3, column=0)
 
     def _file_selection(self):
         self.file = filedialog.askopenfile(parent=root, title='Choose a file')
         if self.file != None:  #If a string is returned from the askopen function (ie file was selected, update file label)
-            self.create_select_file_label()
+            self.file_selected_label.config(text = self.file.name.split("/")[-1])
         else:
             pass
 
@@ -52,12 +57,9 @@ class App():
         self.plot_button.grid(row=2, column=3)
 
     def create_select_file_label(self):
-        try:
-            filename = self.file.name.split("/")[-1]
-        except:
-            filename = "No file selected"
-        self.file_label = tk.Label(root, text=filename, wraplength=80)
-        self.file_label.grid(row=2, column=1)
+        self.filename = "No file selected"
+        self.file_selected_label = tk.Label(root, text=self.filename, wraplength=120)
+        self.file_selected_label.grid(row=2, column=1)
 
     def create_color_entry(self):
         self.color_entry = tk.Entry(relief=SUNKEN)
@@ -76,8 +78,8 @@ class App():
         self.create_color_entry()
         self.create_PlotCD_button()
         self.create_plot_zero_line()
-        self.create_labels()
-        self.root.geometry("600x400")
+        self.create_left_side_labels()
+        self.root.geometry("700x440")
         self.root.mainloop()
 
 
