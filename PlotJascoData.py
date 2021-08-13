@@ -5,9 +5,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from JascoScanFile import JascoScanFile
 
 
-def FindCSVs():
+def FindCSVs(path):
     csvs = []
-    for file in os.listdir('.'):
+    for file in os.listdir(path):
         if file[-4:] == ".csv" or file[-5:] == ".CSV":
             csvs.append(file)
     return csvs
@@ -40,7 +40,7 @@ def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, plotwavelengt
     ax_CD.set_ylim(ylim, ylim2)         #ylimits
     ax_CD.set_xlim(xlim, xlim2)         #xlimits
 
-    # Plotmax=True
+    # Plotmax=True #Cant use JascoScanFile.get_max_CD to support absorbance scaled data
     if plotmax == True:
         plt.plot(maxcd[0], maxcd[1], marker='.', color='red')
         plt.text(maxcd[0] + (maxcd[0] * 0.025), maxcd[1] + (maxcd[1] * 0.025), "{} nm, {} mDeg".format(
@@ -131,9 +131,10 @@ def PlotAbsorbance(JascoScanFile, plotwavelengths=None, savefigure=False, return
 
 
 if __name__ == "__main__":
-    csvs = FindCSVs()
+    path = "./examples"
+    csvs = FindCSVs(path)
 
     for csv in csvs:
-        f = JascoScanFile(csv)
+        f = JascoScanFile("./examples/{}".format(csv))
         PlotCD(f, title=False, savefigure=True, ylimits=(-45,45))
         #PlotAbsorbance(f)
