@@ -1,7 +1,6 @@
 import math
 import os
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from JascoScanFile import JascoScanFile
 
 
@@ -13,10 +12,19 @@ def FindCSVs(path):
     return csvs
 
 
-def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, plotwavelengths=None, savefigure=False, returnfigure=False, color='purple', plotzeroline=False):
+def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, 
+           plotwavelengths=None, savefigure=False, 
+           returnfigure=False, color='purple', 
+           plotzeroline=False, normalize=(False, None, None)):
+    
     # Define the scanfile we're working with, get the x and y lists for plotting
     f = JascoScanFile
-    cd = f.get_CD()
+    
+    if normalize[0] == True:
+        cd = f.get_normalized_data(normalize[1], normalize[2])[0]
+    else:
+        cd = f.get_CD()
+    
     x, y = list(cd.keys()), list(cd.values())
 
     # Max CD for scaling Y axis and plotmax
@@ -81,20 +89,25 @@ def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, plotwavelengt
 
     #If using in another function, get back a tkinter canvas object
     if returnfigure == True:
-        canvas = FigureCanvasTkAgg(fig_CD)
-        return canvas
+        #canvas = FigureCanvasTkAgg(fig_CD)
+        return fig_CD #canvas
 
 
-def PlotAbsorbance(JascoScanFile, plotwavelengths=None, savefigure=False, returnfigure=False):
+def PlotAbsorbance(JascoScanFile, plotwavelengths=None, savefigure=False, returnfigure=False, normalize=(False, None, None), color='black', title=True):
     f = JascoScanFile
-    absorbance = f.get_abs()
+    
+    if normalize[0] == True:
+        absorbance = f.get_normalized_data(normalize[1], normalize[2])[1]
+    else:
+        absorbance = f.get_abs()
+        
     x, y = list(absorbance.keys()), list(absorbance.values())
 
     # Wavelengths for scaling X axis
     xlim, xlim2 = min(x), max(x)
 
     fig_ABS, ax_ABS = plt.subplots(1)  # Create figure fig and add an axis, ax
-    ax_ABS.plot(x, y, color='blue')
+    ax_ABS.plot(x, y, color=color)
     ax_ABS.set_xlim(xlim, xlim2)
     ax_ABS.plot(x, y)
 
@@ -119,6 +132,12 @@ def PlotAbsorbance(JascoScanFile, plotwavelengths=None, savefigure=False, return
     plt.xlabel("Wavelength (nm)")
     plt.title(f.name)
 
+    # Title of the figure
+    if title == True:  #By default the name in the JASCOScanFile
+        plt.title(f.name)
+    elif isinstance(title, str):  # If it's a string, use that string as title
+        plt.title(title)
+
     #If saving figures, save the CD plots in the plots folder
     if savefigure == True:
         plt.savefig("./plots/{}_ABS.svg".format(f.name), dpi=300, format="svg")
@@ -126,8 +145,7 @@ def PlotAbsorbance(JascoScanFile, plotwavelengths=None, savefigure=False, return
 
     #If using in another function, get back a tkinter canvas object
     if returnfigure == True:
-        canvas = FigureCanvasTkAgg(fig_ABS)
-        return canvas
+        return fig_ABS
 
 
 if __name__ == "__main__":
@@ -136,5 +154,5 @@ if __name__ == "__main__":
 
     for csv in csvs:
         f = JascoScanFile("./examples/{}".format(csv))
-        PlotCD(f, title=False, savefigure=True, ylimits=(-45,45))
-        #PlotAbsorbance(f)
+        #PlotCD(f, title=False, savefigure=True, ylimits=(-45,45))
+        #PlotAbsorbance(f, normalize=(True, 1, 240))
