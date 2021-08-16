@@ -1,6 +1,9 @@
 import pandas as pd
 
 
+class NormalizerError(Exception):
+    pass
+
 def Normalizer(JascoScanFile, normalization_value, wavelength_to_normalize):
     '''
 
@@ -19,6 +22,11 @@ def Normalizer(JascoScanFile, normalization_value, wavelength_to_normalize):
         wavelength:CD (mDeg) dictionary for plotting with Plot
 
     '''
+
+    # Check input arguments
+    if normalization_value == '' or wavelength_to_normalize == '':
+        raise NormalizerError("Wavelength and normalization values must be specified")
+
     f = JascoScanFile
     wavelength_to_normalize = float(wavelength_to_normalize)
 

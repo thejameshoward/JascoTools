@@ -3,7 +3,6 @@ import os
 import matplotlib.pyplot as plt
 from JascoScanFile import JascoScanFile
 
-
 def FindCSVs(path):
     csvs = []
     for file in os.listdir(path):
@@ -11,24 +10,66 @@ def FindCSVs(path):
             csvs.append(file)
     return csvs
 
+def TruncateSpectrum(spectrum, lowerbound=None, upperbound=None):
+    if not bool(lowerbound) and not bool(upperbound):
+        print("Truncation requires at least 1 wavelenth cutoff")
+        return
 
-def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True, 
-           plotwavelengths=None, savefigure=False, 
-           returnfigure=False, color='purple', 
-           plotzeroline=False, normalize=(False, None, None)):
-    
+    spectrum_copy = spectrum.copy()
+    # If only a lowerbound is specified
+    if bool(lowerbound) and not bool(upperbound):
+        for wavelength, value in spectrum.items():
+            if wavelength < float(lowerbound):
+                spectrum_copy.pop(wavelength)
+
+    # If only an upperbound is specified
+    elif bool(upperbound) and not bool(lowerbound):
+        for wavelength, value in spectrum.items():
+            if wavelength > float(lowerbound):
+                spectrum_copy.pop(wavelength)
+
+    else:
+        for wavelength, value in spectrum.items():
+            if wavelength < float(lowerbound) or wavelength > float(upperbound):
+                spectrum_copy.pop(wavelength)
+
+    return spectrum_copy
+
+
+def PlotCD(JascoScanFile,
+           plotmax=False,
+           ylimits=None,
+           title=True,
+           plotwavelengths=None,
+           savefigure=False,
+           returnfigure=False,
+           color='purple',
+           plotzeroline=False,
+           normalize=(False, None, None),
+           truncate=(None, None)):
+
     # Define the scanfile we're working with, get the x and y lists for plotting
     f = JascoScanFile
-    
+
+    # If normalizing spectrum
     if normalize[0] == True:
         cd = f.get_normalized_data(normalize[1], normalize[2])[0]
     else:
         cd = f.get_CD()
-    
+
+    # Truncating spectrum
+    if bool(truncate[0]) or bool(truncate[1]):
+        cd = TruncateSpectrum(cd, truncate[0], truncate[1])
+
     x, y = list(cd.keys()), list(cd.values())
 
-    # Max CD for scaling Y axis and plotmax
-    maxcd = f.get_max_CD()
+    #Get the maximum CD
+    maxcd = max(y)
+    for wl, value in cd.items():
+        if value == maxcd:
+            maxcd = (wl, value)
+
+    #Y axis scaling
     if ylimits == None:
         ylim, ylim2 = -abs(maxcd[1]*1.1), abs(maxcd[1]*1.1)
     elif type(ylimits) == tuple:
@@ -40,9 +81,9 @@ def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True,
     # Create figure fig and add an axis, ax
     fig_CD, ax_CD = plt.subplots(1)
 
-
+    #Plot a zero line
     if plotzeroline == True:
-        plt.axhline(y=0, color='#D1D1D1')   #Solid line at zero
+        plt.axhline(y=0, color='#D1D1D1')
 
     ax_CD.plot(x, y, color=color)    #Color
     ax_CD.set_ylim(ylim, ylim2)         #ylimits
@@ -93,14 +134,25 @@ def PlotCD(JascoScanFile, plotmax=False, ylimits=None, title=True,
         return fig_CD #canvas
 
 
-def PlotAbsorbance(JascoScanFile, plotwavelengths=None, savefigure=False, returnfigure=False, normalize=(False, None, None), color='black', title=True):
+def PlotAbsorbance(JascoScanFile,
+                   plotwavelengths=None,
+                   savefigure=False,
+                   returnfigure=False,
+                   normalize=(False, None, None),
+                   color='black',
+                   title=True,
+                   truncate=(None, None)):
+
     f = JascoScanFile
-    
+
     if normalize[0] == True:
         absorbance = f.get_normalized_data(normalize[1], normalize[2])[1]
     else:
         absorbance = f.get_abs()
-        
+
+    if bool(truncate[0]) or bool(truncate[1]):
+        absorbance = TruncateSpectrum(absorbance, truncate[0], truncate[1])
+
     x, y = list(absorbance.keys()), list(absorbance.values())
 
     # Wavelengths for scaling X axis
@@ -154,5 +206,5 @@ if __name__ == "__main__":
 
     for csv in csvs:
         f = JascoScanFile("./examples/{}".format(csv))
-        #PlotCD(f, title=False, savefigure=True, ylimits=(-45,45))
+        PlotCD(f, title=False, savefigure=True, plotmax=True, truncate=(210, 230))
         #PlotAbsorbance(f, normalize=(True, 1, 240))

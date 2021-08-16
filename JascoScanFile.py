@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jul 22 12:18:22 2021
-@author: James Howard
-"""
-
 import os
 import pandas as pd
 from Normalizer import Normalizer
